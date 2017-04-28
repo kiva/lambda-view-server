@@ -26,6 +26,6 @@ plugins:
 custom:
   s3Assets:
     static:
-      bucket: viewserver-dev-assets
+      bucket: ${env:AWS_S3_BUCKET}
       css:
         contentType: text/css
