@@ -1,0 +1,35 @@
+body {
+  font-family: sans-serif;
+}
+
+span, a, a:link, a:visited, a:hover, a:active {
+  display: inline-block;
+  color: #fff;
+  text-decoration: none;
+  padding: 1rem;
+  margin-right: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+a {
+  background-color: #88f;
+}
+
+span {
+  background-color: #f88;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  margin: 0 -0.5rem;
+}
+
+li {
+  padding: 0 0.5rem;
+}
+
+img {
+  width: 100%;
+}
