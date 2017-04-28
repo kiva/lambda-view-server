@@ -71,15 +71,16 @@
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony export (immutable) */ __webpack_exports__["h"] = valueToObjectRepresentation;
 /* harmony export (immutable) */ __webpack_exports__["g"] = storeKeyNameFromField;
 /* harmony export (immutable) */ __webpack_exports__["b"] = storeKeyNameFromFieldNameAndArgs;
 /* harmony export (immutable) */ __webpack_exports__["d"] = resultKeyNameFromField;
 /* harmony export (immutable) */ __webpack_exports__["c"] = isField;
 /* harmony export (immutable) */ __webpack_exports__["e"] = isInlineFragment;
-/* harmony export (immutable) */ __webpack_exports__["h"] = graphQLResultHasError;
+/* harmony export (immutable) */ __webpack_exports__["i"] = graphQLResultHasError;
 /* harmony export (immutable) */ __webpack_exports__["f"] = isIdValue;
 /* harmony export (immutable) */ __webpack_exports__["a"] = toIdValue;
-/* harmony export (immutable) */ __webpack_exports__["i"] = isJsonValue;
+/* harmony export (immutable) */ __webpack_exports__["j"] = isJsonValue;
 function isStringValue(value) {
     return value.kind === 'StringValue';
 }
@@ -191,15 +192,17 @@ function isJsonValue(jsonObject) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* unused harmony export getMutationDefinition */
-/* harmony export (immutable) */ __webpack_exports__["g"] = checkDocument;
-/* harmony export (immutable) */ __webpack_exports__["f"] = getOperationName;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__data_storeUtils__ = __webpack_require__(0);
+/* harmony export (immutable) */ __webpack_exports__["h"] = getMutationDefinition;
+/* harmony export (immutable) */ __webpack_exports__["i"] = checkDocument;
+/* harmony export (immutable) */ __webpack_exports__["g"] = getOperationName;
 /* harmony export (immutable) */ __webpack_exports__["c"] = getFragmentDefinitions;
 /* harmony export (immutable) */ __webpack_exports__["b"] = getQueryDefinition;
-/* harmony export (immutable) */ __webpack_exports__["e"] = getOperationDefinition;
+/* harmony export (immutable) */ __webpack_exports__["f"] = getOperationDefinition;
 /* unused harmony export getFragmentDefinition */
 /* harmony export (immutable) */ __webpack_exports__["a"] = createFragmentMap;
 /* harmony export (immutable) */ __webpack_exports__["d"] = getFragmentQueryDocument;
+/* harmony export (immutable) */ __webpack_exports__["e"] = getDefaultValues;
 var __assign = (this && this.__assign) || Object.assign || function(t) {
     for (var s, i = 1, n = arguments.length; i < n; i++) {
         s = arguments[i];
@@ -208,6 +211,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
     }
     return t;
 };
+
 function getMutationDefinition(doc) {
     checkDocument(doc);
     var mutationDef = null;
@@ -348,6 +352,23 @@ function getFragmentQueryDocument(document, fragmentName) {
         ].concat(document.definitions) });
     return query;
 }
+function getDefaultValues(definition) {
+    if (definition.variableDefinitions && definition.variableDefinitions.length) {
+        var defaultValues = definition.variableDefinitions
+            .filter(function (_a) {
+            var defaultValue = _a.defaultValue;
+            return defaultValue;
+        })
+            .map(function (_a) {
+            var variable = _a.variable, defaultValue = _a.defaultValue;
+            var defaultValueObj = {};
+            __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__data_storeUtils__["h" /* valueToObjectRepresentation */])(defaultValueObj, variable.name, defaultValue);
+            return defaultValueObj;
+        });
+        return Object.assign.apply(Object, [{}].concat(defaultValues));
+    }
+    return {};
+}
 //# sourceMappingURL=getFromAST.js.map
 
 /***/ }),
@@ -406,7 +427,7 @@ var readStoreResolver = function (fieldName, idValue, args, context, _a) {
         context.hasMissingField = true;
         return fieldValue;
     }
-    if (__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__storeUtils__["i" /* isJsonValue */])(fieldValue)) {
+    if (__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__storeUtils__["j" /* isJsonValue */])(fieldValue)) {
         if (idValue.previousResult && __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__util_isEqual__["a" /* isEqual */])(idValue.previousResult[resultKey], fieldValue.json)) {
             return idValue.previousResult[resultKey];
         }
@@ -419,7 +440,8 @@ var readStoreResolver = function (fieldName, idValue, args, context, _a) {
 };
 function diffQueryAgainstStore(_a) {
     var store = _a.store, query = _a.query, variables = _a.variables, previousResult = _a.previousResult, _b = _a.returnPartialData, returnPartialData = _b === void 0 ? true : _b, _c = _a.rootId, rootId = _c === void 0 ? 'ROOT_QUERY' : _c, fragmentMatcherFunction = _a.fragmentMatcherFunction, config = _a.config;
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2__queries_getFromAST__["b" /* getQueryDefinition */])(query);
+    var queryDefinition = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2__queries_getFromAST__["b" /* getQueryDefinition */])(query);
+    variables = Object.assign(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2__queries_getFromAST__["e" /* getDefaultValues */])(queryDefinition), variables);
     var context = {
         store: store,
         returnPartialData: returnPartialData,
@@ -578,6 +600,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
 function writeQueryToStore(_a) {
     var result = _a.result, query = _a.query, _b = _a.store, store = _b === void 0 ? {} : _b, variables = _a.variables, dataIdFromObject = _a.dataIdFromObject, _c = _a.fragmentMap, fragmentMap = _c === void 0 ? {} : _c;
     var queryDefinition = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__queries_getFromAST__["b" /* getQueryDefinition */])(query);
+    variables = Object.assign(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__queries_getFromAST__["e" /* getDefaultValues */])(queryDefinition), variables);
     return writeSelectionSetToStore({
         dataId: 'ROOT_QUERY',
         result: result,
@@ -592,8 +615,10 @@ function writeQueryToStore(_a) {
 }
 function writeResultToStore(_a) {
     var result = _a.result, dataId = _a.dataId, document = _a.document, _b = _a.store, store = _b === void 0 ? {} : _b, variables = _a.variables, dataIdFromObject = _a.dataIdFromObject;
-    var selectionSet = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__queries_getFromAST__["e" /* getOperationDefinition */])(document).selectionSet;
+    var operationDefinition = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__queries_getFromAST__["f" /* getOperationDefinition */])(document);
+    var selectionSet = operationDefinition.selectionSet;
     var fragmentMap = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__queries_getFromAST__["a" /* createFragmentMap */])(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__queries_getFromAST__["c" /* getFragmentDefinitions */])(document));
+    variables = Object.assign(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__queries_getFromAST__["e" /* getDefaultValues */])(operationDefinition), variables);
     return writeSelectionSetToStore({
         result: result,
         dataId: dataId,
@@ -1682,7 +1707,7 @@ function addTypenameToSelectionSet(selectionSet, isRoot) {
     }
 }
 function addTypenameToDocument(doc) {
-    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__getFromAST__["g" /* checkDocument */])(doc);
+    __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__getFromAST__["i" /* checkDocument */])(doc);
     var docClone = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__util_cloneDeep__["a" /* cloneDeep */])(doc);
     docClone.definitions.forEach(function (definition) {
         var isRoot = definition.kind === 'OperationDefinition';
@@ -1928,9 +1953,10 @@ var HTTPFetchNetworkInterface = (function (_super) {
             .then(function (_a) {
             var response = _a.response;
             var httpResponse = response;
-            return httpResponse.json().catch(function () {
+            return httpResponse.json().catch(function (error) {
                 var httpError = new Error("Network request failed with status " + response.status + " - \"" + response.statusText + "\"");
                 httpError.response = httpResponse;
+                httpError.parseError = error;
                 throw httpError;
             });
         })
@@ -3000,7 +3026,7 @@ function data(previousState, action, queries, mutations, config) {
         if (action.requestId < queries[action.queryId].lastRequestId) {
             return previousState;
         }
-        if (!__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__storeUtils__["h" /* graphQLResultHasError */])(action.result)) {
+        if (!__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__storeUtils__["i" /* graphQLResultHasError */])(action.result)) {
             var queryStoreValue = queries[action.queryId];
             var clonedState = __assign({}, previousState);
             var newState_1 = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__writeToStore__["b" /* writeResultToStore */])({
@@ -3020,7 +3046,7 @@ function data(previousState, action, queries, mutations, config) {
         }
     }
     else if (__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__actions__["e" /* isSubscriptionResultAction */])(action)) {
-        if (!__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__storeUtils__["h" /* graphQLResultHasError */])(action.result)) {
+        if (!__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__storeUtils__["i" /* graphQLResultHasError */])(action.result)) {
             var clonedState = __assign({}, previousState);
             var newState_2 = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__writeToStore__["b" /* writeResultToStore */])({
                 result: action.result.data,
@@ -3071,7 +3097,7 @@ function data(previousState, action, queries, mutations, config) {
                     var reducer = updateQueries_1[queryId];
                     var nextQueryResult = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_7__util_errorHandling__["a" /* tryFunctionOrLogError */])(function () { return reducer(currentQueryResult, {
                         mutationResult: constAction.result,
-                        queryName: __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__queries_getFromAST__["f" /* getOperationName */])(query.document),
+                        queryName: __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__queries_getFromAST__["g" /* getOperationName */])(query.document),
                         queryVariables: query.variables,
                     }); });
                     if (nextQueryResult) {
@@ -4417,12 +4443,12 @@ var QueryManager = (function () {
         if (this.addTypename) {
             mutation = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_6__queries_queryTransform__["a" /* addTypenameToDocument */])(mutation);
         }
-        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__queries_getFromAST__["g" /* checkDocument */])(mutation);
+        variables = Object.assign(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__queries_getFromAST__["e" /* getDefaultValues */])(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__queries_getFromAST__["h" /* getMutationDefinition */])(mutation)), variables);
         var mutationString = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_11_graphql_language_printer__["print"])(mutation);
         var request = {
             query: mutation,
             variables: variables,
-            operationName: __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__queries_getFromAST__["f" /* getOperationName */])(mutation),
+            operationName: __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__queries_getFromAST__["g" /* getOperationName */])(mutation),
         };
         this.queryDocuments[mutationId] = mutation;
         var updateQueries = {};
@@ -4436,7 +4462,7 @@ var QueryManager = (function () {
             mutationString: mutationString,
             mutation: mutation,
             variables: variables || {},
-            operationName: __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__queries_getFromAST__["f" /* getOperationName */])(mutation),
+            operationName: __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__queries_getFromAST__["g" /* getOperationName */])(mutation),
             mutationId: mutationId,
             optimisticResponse: optimisticResponse,
             extraReducers: this.getExtraReducers(),
@@ -4464,7 +4490,7 @@ var QueryManager = (function () {
                     result: result,
                     mutationId: mutationId,
                     document: mutation,
-                    operationName: __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__queries_getFromAST__["f" /* getOperationName */])(mutation),
+                    operationName: __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__queries_getFromAST__["g" /* getOperationName */])(mutation),
                     variables: variables || {},
                     extraReducers: _this.getExtraReducers(),
                     updateQueries: updateQueries,
@@ -4690,7 +4716,11 @@ var QueryManager = (function () {
         if (options.noFetch) {
             throw new Error('noFetch option is no longer supported since Apollo Client 1.0. Use fetchPolicy instead.');
         }
-        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__queries_getFromAST__["b" /* getQueryDefinition */])(options.query);
+        var queryDefinition = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__queries_getFromAST__["b" /* getQueryDefinition */])(options.query);
+        if (queryDefinition.variableDefinitions && queryDefinition.variableDefinitions.length) {
+            var defaultValues = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__queries_getFromAST__["e" /* getDefaultValues */])(queryDefinition);
+            options.variables = Object.assign(defaultValues, options.variables);
+        }
         if (typeof options.notifyOnNetworkStatusChange === 'undefined') {
             options.notifyOnNetworkStatusChange = false;
         }
@@ -4818,15 +4848,16 @@ var QueryManager = (function () {
     };
     QueryManager.prototype.startGraphQLSubscription = function (options) {
         var _this = this;
-        var query = options.query, variables = options.variables;
+        var query = options.query;
         var transformedDoc = query;
         if (this.addTypename) {
             transformedDoc = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_6__queries_queryTransform__["a" /* addTypenameToDocument */])(transformedDoc);
         }
+        var variables = Object.assign(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__queries_getFromAST__["e" /* getDefaultValues */])(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__queries_getFromAST__["f" /* getOperationDefinition */])(query)), options.variables);
         var request = {
             query: transformedDoc,
             variables: variables,
-            operationName: __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__queries_getFromAST__["f" /* getOperationName */])(transformedDoc),
+            operationName: __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__queries_getFromAST__["g" /* getOperationName */])(transformedDoc),
         };
         var subId;
         var observers = [];
@@ -4845,9 +4876,9 @@ var QueryManager = (function () {
                         _this.store.dispatch({
                             type: 'APOLLO_SUBSCRIPTION_RESULT',
                             document: transformedDoc,
-                            operationName: __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__queries_getFromAST__["f" /* getOperationName */])(transformedDoc),
+                            operationName: __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__queries_getFromAST__["g" /* getOperationName */])(transformedDoc),
                             result: { data: result },
-                            variables: variables || {},
+                            variables: variables,
                             subscriptionId: subId,
                             extraReducers: _this.getExtraReducers(),
                         });
@@ -4958,7 +4989,7 @@ var QueryManager = (function () {
         var request = {
             query: document,
             variables: variables,
-            operationName: __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__queries_getFromAST__["f" /* getOperationName */])(document),
+            operationName: __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__queries_getFromAST__["g" /* getOperationName */])(document),
         };
         var retPromise = new Promise(function (resolve, reject) {
             _this.addFetchQueryPromise(requestId, retPromise, resolve, reject);
@@ -4968,7 +4999,7 @@ var QueryManager = (function () {
                 _this.store.dispatch({
                     type: 'APOLLO_QUERY_RESULT',
                     document: document,
-                    operationName: __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__queries_getFromAST__["f" /* getOperationName */])(document),
+                    operationName: __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__queries_getFromAST__["g" /* getOperationName */])(document),
                     result: result,
                     queryId: queryId,
                     requestId: requestId,
@@ -5000,7 +5031,7 @@ var QueryManager = (function () {
                 }
                 _this.removeFetchQueryPromise(requestId);
                 resolve({ data: resultFromStore, loading: false, networkStatus: __WEBPACK_IMPORTED_MODULE_3__queries_networkStatus__["a" /* NetworkStatus */].ready, stale: false });
-                return null;
+                return Promise.resolve();
             }).catch(function (error) {
                 reject(error);
             });
@@ -5350,7 +5381,7 @@ function queries(previousState, action) {
             return previousState;
         }
         var newState = __assign({}, previousState);
-        var resultHasGraphQLErrors = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__data_storeUtils__["h" /* graphQLResultHasError */])(action.result);
+        var resultHasGraphQLErrors = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__data_storeUtils__["i" /* graphQLResultHasError */])(action.result);
         newState[action.queryId] = __assign({}, previousState[action.queryId], { networkError: null, graphQLErrors: resultHasGraphQLErrors ? action.result.errors : [], previousVariables: null, networkStatus: __WEBPACK_IMPORTED_MODULE_3__networkStatus__["a" /* NetworkStatus */].ready });
         if (typeof action.fetchMoreForQueryId === 'string') {
             newState[action.fetchMoreForQueryId] = __assign({}, previousState[action.fetchMoreForQueryId], { networkStatus: __WEBPACK_IMPORTED_MODULE_3__networkStatus__["a" /* NetworkStatus */].ready });
@@ -5818,7 +5849,7 @@ function cloneDeep(value) {
 /* 51 */
 /***/ (function(module, exports) {
 
-exports.version = "1.0.4"
+exports.version = "1.1.1"
 
 /***/ }),
 /* 52 */
